@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur de mot de passe sécurisé</title>
+
+<style>
+body {
+    font-family: system-ui, Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 1rem;
+}
+.container {
+    max-width: 420px;
+    margin: auto;
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+button {
+    width: 100%;
+    padding: 0.8rem;
+    margin-top: 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+input, select {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.4rem;
+    font-size: 1rem;
+}
+label {
+    font-weight: bold;
+}
+small {
+    color: #555;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>?? Générateur de mot de passe</h2>
+
+<label>Mode</label>
+<select id="mode">
+    <option value="complex">Mot de passe complexe</option>
+    <option value="phrase">Phrase de passe (ANSSI)</option>
+</select>
+
+<label>Longueur / Nombre de mots</label>
+<input type="number" id="length" value="16" min="4" max="64">
+
+<button onclick="generate()">Générer</button>
+
+<label>Résultat</label>
+<input type="text" id="result" readonly>
+
+<button onclick="copy()">?? Copier</button>
+
+<small>
+? Gratuit • ? Local • ? Sécurisé • ? Bonnes pratiques ANSSI
+</small>
+</div>
+
+<script>
+// Liste simple de mots pour les phrases de passe
+const words = [
+"chat","soleil","forêt","montagne","rivière","nuage","orage","lumière",
+"étoile","horizon","vent","pierre","arbre","océan","flamme","neige"
+];
+
+function generate() {
+    const mode = document.getElementById("mode").value;
+    const length = Number(document.getElementById("length").value);
+    let output = "";
+
+    if (mode === "complex") {
+        const charset =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "abcdefghijklmnopqrstuvwxyz" +
+            "0123456789" +
+            "!@#$%^&*()-_=+[]{}<>?";
+
+        const random = new Uint32Array(length);
+        window.crypto.getRandomValues(random);
+
+        for (let i = 0; i < length; i++) {
+            output += charset[random[i] % charset.length];
+        }
+    } else {
+        const random = new Uint32Array(length);
+        window.crypto.getRandomValues(random);
+
+        for (let i = 0; i < length; i++) {
+            output += words[random[i] % words.length];
+            if (i < length - 1) output += "-";
+        }
+    }
+
+    document.getElementById("result").value = output;
+}
+
+function copy() {
+    const field = document.getElementById("result");
+    navigator.clipboard.writeText(field.value);
+    alert("Mot de passe copié ?");
+}
+</script>
+
+</body>
+</html>
